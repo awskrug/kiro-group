@@ -1,4 +1,5 @@
 # Kiro 한국 사용자 모임
+<img src="https://github.com/awskrug/awskrug-digital-assets/blob/master/kiro/kiro-gat.png" width="250">
 
 ## 모임 히스토리
 ### 2026-01-22
