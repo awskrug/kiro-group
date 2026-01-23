@@ -1,0 +1,1 @@
+https://slides.yanbert.com/20260122-kiro-krug
