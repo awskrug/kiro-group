@@ -9,7 +9,7 @@
 - 라이트닝 토크
   - Spec 기반 Autonomous 개발은 어디까지 가능할까? - 조원상
   - Kiro로 Openclaw 호스팅하기 - 김현민
-  - AI-DLC에 대한 생각 - 윤평호
+  - AI-DLC에 대한 생각 - 윤평호 | [발표자료](https://github.com/awskrug/kiro-group/blob/main/slides/2026-02-12/AI-DLC.md)
   - Kiro로 발표준비 하기 - Yan So | [발표자료](https://slides.yanbert.com/20260212-kiro-krug-make-slides-with-kiro)
 
 
