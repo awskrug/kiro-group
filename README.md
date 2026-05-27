@@ -2,6 +2,16 @@
 <img src="https://github.com/awskrug/awskrug-digital-assets/blob/master/kiro/kiro-gat.png" width="250">
 
 ## 모임 히스토리
+### 2026-04-23
+​- 세션1 - EKS 파트 IP 부족 이슈를 Kiro로 해결하기 / 고현수 / AWS Cloud Support Engineer
+​- 세션2 - IAM 정책 이슈를 Kiro로 해결하기 / 이윤수 / AWS Cloud Support Associate
+​- 세션3 - 아키텍처로부터 Kiro를 통해 개발하기 / 한규성 / AWS Cloud Support Engineer
+
+### 2026-03-19
+​- (워크샵) Kiro CLI를 활용한 스펙 기반 개발
+​  - Kiro CLI를 이용해서 간단한 어플리케이션을 직접 만들어보는 워크샵을 진행합니다.
+​- 미니세션
+​  - Kiro Autonomous Agents 소개와 데모 - 최용호 | AWS
 
 ### 2026-02-12
 - 메인세션
@@ -19,6 +29,12 @@
 - 라이트닝 토크
   - AI-Workflow를 활용한 개발팀 생산성 올리기 - 권태관(우아한형제들)   | [발표자료](https://github.com/awskrug/kiro-group/blob/main/slides/2026-01-22/AI%20Workflow%20-%20Kiro%20한국%20사용자%20모임%202026%20-%20권태관.pdf)
   - Kiro 야생 적응기 - ​남기웅(브이피피랩) | [발표자료](https://github.com/awskrug/kiro-group/blob/main/slides/2026-01-22/Kiro_IDE_Presentation.pdf)
+
+<br>
+
+## 사용자 인터뷰
+
+- [Kiro 사용자 인터뷰 #1 - VPPLAB 정희인님](https://yanlog.yanbert.com/ko/blog/kiro-user-interview-001-20260526/)
 
 <br>
 
