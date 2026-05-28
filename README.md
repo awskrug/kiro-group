@@ -7,15 +7,15 @@
 - 세션2: AWS 멀티 어카운트 기술 지원 접근 전략 및 침해사고 대응 고도화 (With Kiro & AWS Login) - [허준(메가존)](https://linkedin.com/in/june-her-50888112a) | [발표자료](https://github.com/awskrug/kiro-group/blob/main/slides/2026-05-28/메가존클라우드_허준_%5BKiro%20한국사용자%20모임%5D%20AWS%20멀티%20어카운트%20기술%20지원%20접근%20전략%20%20및%20침해사고%20대응%20고도화(with%20Kiro)_260528.pdf)
 
 ### 2026-04-23
-- 세션1: EKS 파트 IP 부족 이슈를 Kiro로 해결하기 / 고현수 / AWS Cloud Support Engineer
-- 세션2: IAM 정책 이슈를 Kiro로 해결하기 / 이윤수 / AWS Cloud Support Associate
-- 세션3: 아키텍처로부터 Kiro를 통해 개발하기 / 한규성 / AWS Cloud Support Engineer
+- 세션1: EKS 파트 IP 부족 이슈를 Kiro로 해결하기 - 고현수(AWS Cloud Support Engineer)
+- 세션2: IAM 정책 이슈를 Kiro로 해결하기 - 이윤수(AWS Cloud Support Associate)
+- 세션3: 아키텍처로부터 Kiro를 통해 개발하기 - 한규성(AWS Cloud Support Engineer)
 
 ### 2026-03-19
 - (워크샵) Kiro CLI를 활용한 스펙 기반 개발
 - Kiro CLI를 이용해서 간단한 어플리케이션을 직접 만들어보는 워크샵을 진행합니다.
 - 미니세션
-  - Kiro Autonomous Agents 소개와 데모 - 최용호 | AWS
+  - Kiro Autonomous Agents 소개와 데모 - 최용호(AWS)
 
 ### 2026-02-12
 - 메인세션
