@@ -2,6 +2,10 @@
 <img src="https://github.com/awskrug/awskrug-digital-assets/blob/master/kiro/kiro-gat.png" width="250">
 
 ## 모임 히스토리
+### 2026-05-28
+- 세션1: Agent 관리 프로그램 소개 - 서혁범(엑심베이)
+- 세션2: AWS 멀티 어카운트 기술 지원 접근 전략 및 침해사고 대응 고도화 (With Kiro & AWS Login) - [허준(메가존)](https://linkedin.com/in/june-her-50888112a) | [발표자료](https://github.com/awskrug/kiro-group/blob/main/slides/2026-05-28/메가존클라우드_허준_%5BKiro%20한국사용자%20모임%5D%20AWS%20멀티%20어카운트%20기술%20지원%20접근%20전략%20%20및%20침해사고%20대응%20고도화(with%20Kiro)_260528.pdf)
+
 ### 2026-04-23
 - 세션1: EKS 파트 IP 부족 이슈를 Kiro로 해결하기 / 고현수 / AWS Cloud Support Engineer
 - 세션2: IAM 정책 이슈를 Kiro로 해결하기 / 이윤수 / AWS Cloud Support Associate
