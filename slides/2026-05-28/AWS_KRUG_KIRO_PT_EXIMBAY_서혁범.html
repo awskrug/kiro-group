@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentManager — TechSession 2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden}
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#58a6ff,#3fb950);transition:width .3s;z-index:100}
+#counter{position:fixed;bottom:24px;right:32px;color:#484f58;font-size:.85rem;z-index:100;font-variant-numeric:tabular-nums}
+.slide{position:absolute;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .35s;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.c{max-width:1100px;width:100%;padding:48px 64px}
+h1{font-size:3rem;color:#e6edf3;margin-bottom:.6rem;font-weight:700;letter-spacing:-.02em}
+h2{font-size:2.2rem;color:#e6edf3;margin-bottom:1.2rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.2rem;color:#e6edf3;margin-bottom:.5rem;font-weight:600}
+p{font-size:1.1rem;line-height:1.7;color:#8b949e}
+.sub{font-size:1.3rem;color:#8b949e}
+.tag{display:inline-block;background:#1f6feb;color:#fff;padding:5px 16px;border-radius:20px;font-size:.85rem;margin:3px 4px;font-weight:500}
+.tg{background:#238636}.ty{background:#9e6a03}.tr{background:#da3633}.tp{background:#6e40c9}.td{background:#30363d;color:#8b949e}
+.box{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:24px}
+.bb{border-color:#58a6ff}.bg{border-color:#3fb950}.by{border-color:#d29922}.br{border-color:#f85149}.bp{border-color:#bc8cff}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+.code{background:#0d1117;border:1px solid #21262d;border-radius:10px;padding:20px 24px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:.82rem;color:#e6edf3;white-space:pre;line-height:1.7;overflow-x:auto}
+.cm{color:#6e7681}.kw{color:#ff7b72}.st{color:#a5d6ff}.fn{color:#d2a8ff}.tp2{color:#79c0ff}
+.hi{background:#1f6feb15;border-left:3px solid #58a6ff;padding:14px 20px;border-radius:0 10px 10px 0;margin:10px 0}
+.hr{background:#f8514915;border-left-color:#f85149}
+.hg{background:#3fb95015;border-left-color:#3fb950}
+.tc{text-align:center}
+.tb{color:#58a6ff}.tgr{color:#3fb950}.tye{color:#d29922}.tre{color:#f85149}.tm{color:#8b949e}
+.mt1{margin-top:16px}.mt2{margin-top:32px}.mb1{margin-bottom:16px}
+.seq{padding:20px 0}.seq-head{display:flex;margin-bottom:24px;gap:16px}.seq-col{flex:1;text-align:center;font-size:1.3rem;font-weight:700;color:#e6edf3;padding:22px 20px;border-radius:14px}
+.seq-col.c-am{background:#1f6feb22;border:2px solid #1f6feb}.seq-col.c-cli{background:#23863622;border:2px solid #238636}.seq-col.c-wf{background:#9e6a0322;border:2px solid #9e6a03}.seq-col.c-rv{background:#6e40c922;border:2px solid #6e40c9}
+.seq-step{display:flex;align-items:center;margin:12px 0;opacity:0;transform:translateY(6px);transition:all .4s}
+.seq-step.vis{opacity:1;transform:translateY(0)}
+.seq-step .col{flex:1;display:flex;align-items:center;justify-content:center;min-height:60px;position:relative}
+.seq-step .col::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:#21262d}
+.seq-arrow{position:absolute;height:3px;background:linear-gradient(90deg,#58a6ff,#3fb950);border-radius:2px;transition:width .5s .15s;width:0}
+.seq-step.vis .seq-arrow{width:calc(100% - 20px)}
+.seq-arrow.rl{background:linear-gradient(90deg,#3fb950,#58a6ff)}
+.seq-arrow.bad{background:linear-gradient(90deg,#f85149,#da3633)}
+.seq-lbl{position:relative;z-index:2;background:#161b22;border:2px solid #30363d;border-radius:14px;padding:14px 28px;font-size:1.05rem;color:#e6edf3;min-width:180px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.seq-lbl.good{border-color:#3fb950;color:#3fb950;background:#3fb95010}.seq-lbl.bad{border-color:#f85149;color:#f85149;background:#f8514910}.seq-lbl.warn{border-color:#d29922;color:#d29922;background:#d2992210}
+.seq-note{text-align:center;font-size:1.05rem;color:#8b949e;font-style:italic;margin:14px 0;opacity:0;transition:opacity .4s}
+.seq-note.vis{opacity:1}
+.step-ctrl{text-align:center;margin-top:28px}
+.step-btn{background:#1f6feb;color:#fff;border:none;padding:14px 40px;border-radius:12px;font-size:1.1rem;cursor:pointer;margin:0 10px}
+.step-btn:hover{background:#388bfd}
+.step-btn.reset{background:#30363d;color:#8b949e}
+.step-hint{color:#484f58;font-size:.9rem;margin-top:12px}
+.big{font-size:4rem;font-weight:800;line-height:1}
+.flow{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+.flow .node{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px 22px;text-align:center;font-size:.95rem;color:#e6edf3}
+.flow .arr{color:#484f58;font-size:1.4rem;padding:0 10px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px;text-align:center}
+.card .ic{font-size:1.8rem;margin-bottom:8px}
+.card h3{margin-bottom:4px;font-size:1rem}
+.card p{font-size:.85rem}
+.versus{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center}
+.versus .vs{font-size:2rem;color:#484f58;padding:0 24px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{background:#161b22;color:#e6edf3;padding:10px 16px;text-align:left;border-bottom:2px solid #21262d;font-weight:600}
+td{padding:9px 16px;color:#c9d1d9;border-bottom:1px solid #161b22}
+tr:hover td{background:#161b2280}
+.agenda-item{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid #21262d}
+.agenda-item:last-child{border-bottom:none}
+.agenda-num{width:32px;height:32px;background:#1f6feb;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0}
+.agenda-num.ag{background:#238636}.agenda-num.ay{background:#9e6a03}.agenda-num.ap{background:#6e40c9}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="counter"></div>
+
+<!-- ===== 1. TITLE ===== -->
+<div class="slide" id="s1">
+<div class="c tc">
+<div style="font-size:4.5rem;margin-bottom:16px">🤖</div>
+<h1 style="font-size:3.8rem">AgentManager</h1>
+<p class="sub" style="margin:12px 0 40px">AI 코딩 에이전트를 한 곳에서 관리·추적하는 웹 대시보드</p>
+<p style="margin-top:48px;color:#484f58">EXIMBAY · 서혁범 · 2026</p>
+</div>
+</div>
+
+<!-- ===== 2. AGENDA ===== -->
+<div class="slide" id="s2">
+<div class="c">
+<h2>오늘 이야기</h2>
+<div style="max-width:700px;margin:24px auto 0">
+<div class="agenda-item"><div class="agenda-num">1</div><div><strong style="color:#e6edf3">WHY</strong> <span class="tm">— 에이전트 쓰면서 생긴 문제</span></div></div>
+<div class="agenda-item"><div class="agenda-num">2</div><div><strong style="color:#e6edf3">WHAT</strong> <span class="tm">— AgentManager가 하는 일</span></div></div>
+<div class="agenda-item"><div class="agenda-num ag">3</div><div><strong style="color:#e6edf3">HOW: 연결</strong> <span class="tm">— Classic PTY → 문제 누적 → ACP 전환</span></div></div>
+<div class="agenda-item"><div class="agenda-num ap">4</div><div><strong style="color:#e6edf3">HOW: 협업</strong> <span class="tm">— subagent의 한계 → Mailbox 모드</span></div></div>
+<div class="agenda-item"><div class="agenda-num" style="background:#30363d">▶</div><div><strong style="color:#e6edf3">DEMO</strong></div></div>
+</div>
+</div>
+</div>
+
+<!-- ===== 3. PROBLEM ===== -->
+<div class="slide" id="s3">
+<div class="c">
+<h2>에이전트 쓸수록 생기는 문제</h2>
+<div class="g3 mt2">
+<div class="card br">
+<div class="ic">🖥️ ×N</div>
+<h3>터미널 난립</h3>
+<p>에이전트마다 터미널 1개<br>프로젝트가 늘면 기하급수</p>
+</div>
+<div class="card by">
+<div class="ic">👁️‍🗨️</div>
+<h3>상태 블랙박스</h3>
+<p>지금 작업 중인지, 멈춘 건지<br>하나하나 들여다봐야 앎</p>
+</div>
+<div class="card">
+<div class="ic">🔄</div>
+<h3>수동 정리</h3>
+<p>작업 끝나면 커밋, Jira,<br>기록 정리는 전부 내 몫</p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 4. SOLUTION INTRO ===== -->
+<div class="slide" id="s4">
+<div class="c tc">
+<h2 style="font-size:2.5rem;margin-bottom:8px">AgentManager가 하는 일</h2>
+<p class="sub mb1">웹 대시보드 하나로 에이전트 관리 + 작업 자동 추적</p>
+<div class="g3 mt2">
+<div class="card bb"><div class="ic">📡</div><h3>실시간 모니터링</h3><p>상태 한눈에</p></div>
+<div class="card bb"><div class="ic">🖥️</div><h3>멀티 터미널</h3><p>4분할 동시 뷰</p></div>
+<div class="card bb"><div class="ic">🔌</div><h3>6종 CLI 통합</h3><p>Kiro~Custom</p></div>
+<div class="card bg"><div class="ic">📋</div><h3>Task Board</h3><p>Job↔Task 자동 연결</p></div>
+<div class="card bg"><div class="ic">🤖</div><h3>System Agent</h3><p>작업 분배·매칭</p></div>
+<div class="card bg"><div class="ic">💾</div><h3>Git 자동 백업</h3><p>형상관리 자동화</p></div>
+</div>
+</div>
+</div>
+
+<!-- ===== 5. DOMAIN + DATA ===== -->
+<div class="slide" id="s5">
+<div class="c">
+<h2>내부 구조</h2>
+<div class="g2 mt1">
+<div>
+<p style="color:#e6edf3;font-weight:600;margin-bottom:12px">4대 도메인</p>
+<div class="flow" style="flex-direction:column;gap:8px;align-items:stretch">
+<div class="node bb" style="text-align:left;padding:12px 18px"><strong>Project</strong> <span class="tm" style="font-size:.85rem">— 작업 공간 (Git 경로)</span></div>
+<div style="text-align:center;color:#484f58;font-size:.9rem">↓ has many</div>
+<div class="node bb" style="text-align:left;padding:12px 18px"><strong>Agent</strong> <span class="tm" style="font-size:.85rem">— CLI 인스턴스 + 상태</span></div>
+<div style="text-align:center;color:#484f58;font-size:.9rem">↓ produces</div>
+<div class="node bb" style="text-align:left;padding:12px 18px"><strong>Job</strong> <span class="tm" style="font-size:.85rem">— 프롬프트 1건의 실행 기록</span></div>
+<div style="text-align:center;color:#3fb950;font-size:.9rem">⇄ auto-link</div>
+<div class="node bg" style="text-align:left;padding:12px 18px"><strong>Task</strong> <span class="tm" style="font-size:.85rem">— 사람이 정의한 업무 단위</span></div>
+</div>
+</div>
+<div>
+<p style="color:#e6edf3;font-weight:600;margin-bottom:12px">데이터 저장: DB 없이 JSON</p>
+<div class="code" style="font-size:.78rem;padding:14px 18px">~/.agent-manager/
+├── projects.json
+├── agents.json
+├── tasks.json
+├── jobs/
+│   ├── job-a1b2.json
+│   └── job-c3d4.json
+├── timeline/
+└── <span class="fn" style="color:#d2a8ff;font-weight:700">.kiro/</span>            <span style="color:#d2a8ff"># ⭐ System Agent</span>
+    <span style="color:#d2a8ff">├── agents/prompts/</span>
+    <span style="color:#d2a8ff">└── steering/</span></div>
+<div style="display:flex;gap:10px;margin-top:12px">
+<div class="card bg" style="padding:10px 14px;flex:1"><p style="font-size:.8rem;color:#e6edf3">외부 의존 zero</p></div>
+<div class="card bb" style="padding:10px 14px;flex:1"><p style="font-size:.8rem;color:#e6edf3">Git 자동 동기화</p></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 6. SYSTEM AGENT ===== -->
+<div class="slide" id="s6">
+<div class="c">
+<h2>System Agent - 프로그램 내부 에이전트</h2>
+<div class="flow mt2">
+<div class="node" style="border-color:#58a6ff;min-width:180px"><strong>👤 사용자</strong><br><span class="tm" style="font-size:.8rem">"버그 수정 + API 리팩토링"</span></div>
+<div class="arr">→</div>
+<div class="node" style="border-color:#d29922;min-width:180px"><strong>🎯 Supervisor</strong><br><span class="tm" style="font-size:.8rem">분석 → 분배</span></div>
+<div class="arr">→</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="node" style="border-color:#3fb950;min-width:160px;padding:10px 16px"><strong>Agent-1</strong> <span class="tm">프론트</span></div>
+<div class="node" style="border-color:#3fb950;min-width:160px;padding:10px 16px"><strong>Agent-2</strong> <span class="tm">API</span></div>
+</div>
+</div>
+<div class="g2 mt2">
+<div>
+<div class="g3" style="gap:10px">
+<div class="hi" style="margin:0"><strong>Supervisor</strong><br><p>작업 분배 + 모니터링</p></div>
+<div class="hi hg" style="margin:0"><strong>UserGuide</strong><br><p>사용법 안내 챗봇</p></div>
+<div class="hi" style="margin:0;background:#6e40c915;border-left-color:#bc8cff"><strong>TaskManager</strong><br><p>Job↔Task 자동 매칭</p></div>
+</div>
+</div>
+<div>
+<p style="color:#e6edf3;font-weight:600;margin-bottom:8px">제어 방식: 마커 블록</p>
+<div class="code" style="font-size:.76rem;padding:12px 16px">---AGENT_RESPONSE_START---
+ACTION: <span class="st">SEND_COMMAND</span>
+TARGET: <span class="st">{agentId}</span>
+COMMAND: <span class="st">로그인 버그 수정해줘</span>
+---AGENT_RESPONSE_END---
+<span class="cm">// → 프로그램이 파싱 → 대상 Agent에 주입</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 7. KIRO CLI MODES ===== -->
+<div class="slide" id="s7">
+<div class="c">
+<h2>에이전트 연결: Kiro CLI 3가지 모드</h2>
+<table class="mt1">
+<tr><th style="width:18%"></th><th style="width:27%">Classic <code>--classic</code></th><th style="width:27%"><code>chat --no-interactive</code></th><th style="width:28%">ACP <code></code></th></tr>
+<tr><td style="color:#e6edf3;font-weight:600">정체</td><td>Legacy UI (대화형 터미널)</td><td>단발 실행 모드</td><td><span class="tgr">JSON-RPC 프로토콜</span></td></tr>
+<tr><td style="color:#e6edf3;font-weight:600">통신</td><td>PTY (가상 터미널)</td><td>PTY (가상 터미널)</td><td><span class="tgr">stdio (구조화 JSON)</span></td></tr>
+<tr><td style="color:#e6edf3;font-weight:600">상태 감지</td><td>regex로 추론 😰</td><td>regex로 추론</td><td><span class="tgr">명시적 이벤트 (TurnEnd)</span></td></tr>
+<tr><td style="color:#e6edf3;font-weight:600">승인 처리</td><td>PTY 키 입력 (y/n, ↑↓)</td><td><code>--trust-all-tools</code> 필요</td><td><span class="tgr">JSON 메시지 제어</span></td></tr>
+<tr><td style="color:#e6edf3;font-weight:600">세션 유지</td><td>✅ 다회 대화</td><td>⚠️ 가능하나 비실용적</td><td><span class="tgr">✅ session 기반</span></td></tr>
+<tr><td style="color:#e6edf3;font-weight:600">적합 용도</td><td>터미널 직접 사용</td><td>CI/CD · 스크립트</td><td><span class="tgr">프로그래밍 통합</span></td></tr>
+</table>
+<div class="g3 mt2">
+<div class="card br" style="padding:14px"><h3 style="font-size:.9rem">Classic 선택 이유</h3><p style="font-size:.8rem">세션 유지 + 대화형. 당시 ACP 없었음</p></div>
+<div class="card by" style="padding:14px"><h3 style="font-size:.9rem">--no-interactive 탈락</h3><p style="font-size:.8rem">단발 실행 특화 → 연속 작업에 부적합</p></div>
+<div class="card bg" style="padding:14px"><h3 style="font-size:.9rem">ACP = 정답</h3><p style="font-size:.8rem">기계 친화 + 세션 유지 + 구조화</p></div>
+</div>
+</div>
+</div>
+
+<!-- ===== 8. CLASSIC MODE ===== -->
+<div class="slide" id="s8">
+<div class="c">
+<h2>Classic 모드: PTY로 에이전트 제어</h2>
+<div class="code mt1"><span class="cm">// 터미널을 프로그래밍으로 제어</span>
+<span class="kw">const</span> pty = spawn(<span class="st">'kiro-cli'</span>, [<span class="st">'--classic'</span>, <span class="st">'--agent'</span>, name]);
+
+pty.<span class="fn">on</span>(<span class="st">'data'</span>, (raw) => {
+  <span class="cm">// raw = ANSI코드 + 스피너 + 텍스트가 뒤섞인 날것</span>
+  <span class="cm">// 이걸 regex로 파싱해서 "지금 뭐 하는 중인지" 추론</span>
+  handler.<span class="fn">extractCompletionTime</span>(raw);   <span class="cm">// 완료?</span>
+  handler.<span class="fn">extractActionRequired</span>(raw);   <span class="cm">// 승인?</span>
+  handler.<span class="fn">isReadyPrompt</span>(raw);           <span class="cm">// 부팅됨?</span>
+  handler.<span class="fn">extractProgress</span>(raw);         <span class="cm">// 몇%?</span>
+});</div>
+<div class="hi hr mt2">
+<p style="color:#e6edf3;font-size:1.05rem"><strong>핵심 문제:</strong> 터미널 출력은 "사람이 눈으로 보는 용도"이지, 프로그램이 파싱하는 용도가 아님</p>
+</div>
+</div>
+</div>
+
+<!-- ===== 9. OUTPUT HANDLER ===== -->
+<div class="slide" id="s9">
+<div class="c">
+<h2>KiroOutputHandler: regex</h2>
+<div class="g2 mt1">
+<table>
+<tr><th>메서드</th><th>파싱 대상</th></tr>
+<tr><td><code class="fn">extractCompletionTime</code></td><td><code class="st">▸ Time: 2m 25s</code></td></tr>
+<tr><td><code class="fn">extractActionRequired</code></td><td><code class="st">[y/n]:</code> , <code class="st">❯ scope</code></td></tr>
+<tr><td><code class="fn">extractProgress</code></td><td><code class="st">[Agent] 16% ></code></td></tr>
+<tr><td><code class="fn">isReadyPrompt</code></td><td><code class="st">></code> 문자 포함</td></tr>
+<tr><td><code class="fn">filterOutput</code></td><td>ANSI + 스피너 <code class="st">⠋⠙⠹</code></td></tr>
+<tr><td><code class="fn">cleanupFinalOutput</code></td><td>중복 라인, <code class="st">한한글글</code></td></tr>
+</table>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="card br" style="padding:14px 18px"><p style="color:#e6edf3;font-size:.9rem">텍스트 파싱 = <strong>추론</strong><br>확정이 아님</p></div>
+<div class="card by" style="padding:14px 18px"><p style="color:#e6edf3;font-size:.9rem">CLI 업데이트하면<br>regex가 <strong>깨짐</strong></p></div>
+<div class="card" style="padding:14px 18px"><p style="color:#e6edf3;font-size:.9rem">불확실성을 보정하려면<br>→ <strong>보정 로직</strong> 추가</p></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 10. 16 COMPENSATIONS ===== -->
+<div class="slide" id="s10">
+<div class="c">
+<h2>쌓여간 보정 로직</h2>
+<div class="g3 mt1">
+<div class="box br" style="padding:18px">
+<h3>⏱️ 타이밍 ×6</h3>
+<p style="font-size:.82rem;color:#c9d1d9;margin-top:8px">
+completionTimer 3초<br>
+Thinking 감지→취소<br>
+bootingTimer 30초<br>
+commandMonitor 10초<br>
+staleTimer 60초<br>
+resumeDebounce 0.8초
+</p>
+</div>
+<div class="box by" style="padding:18px">
+<h3>🔁 중복방지 ×4</h3>
+<p style="font-size:.82rem;color:#c9d1d9;margin-top:8px">
+autoResponse dedup<br>
+outputBuffer 2000자<br>
+scopeRetry ×3<br>
+commandRetried 1회
+</p>
+</div>
+<div class="box" style="padding:18px">
+<h3>🧹 출력정제 ×6</h3>
+<p style="font-size:.82rem;color:#c9d1d9;margin-top:8px">
+ANSI escape 제거<br>
+\r 덮어쓰기 처리<br>
+스피너 문자 제거<br>
+라인 중복 제거<br>
+문자 중복 제거<br>
+메뉴 역파싱
+</p>
+</div>
+</div>
+<div class="tc mt2">
+<p style="font-size:1.3rem;color:#f85149;font-weight:700">하나 고치면 다른 게 깨짐 → 또 보정 추가 → 반복</p>
+</div>
+</div>
+</div>
+
+<!-- ===== 11. REAL FAILURES ===== -->
+<div class="slide" id="s11">
+<div class="c">
+<h2>실제로 터진 것들 💥</h2>
+<div class="g2 mt2">
+<div class="box br" style="padding:24px">
+<h3 style="font-size:1.3rem;margin-bottom:12px">한한글글이이</h3>
+<div class="code" style="font-size:.78rem;padding:12px 16px"><span class="cm">// 유니코드 스트리밍에서 문자가 2번씩</span>
+<span class="st">"한한글글"</span> → <span class="st">"한글"</span> 로 복원해야 함
+<span class="cm">// 별도 removeCharacterDuplicates() 작성...</span></div>
+</div>
+<div class="box by" style="padding:24px">
+<h3 style="font-size:1.3rem;margin-bottom:12px">&gt; 문자 오탐</h3>
+<div class="code" style="font-size:.78rem;padding:12px 16px"><span class="cm">// 부팅 감지 = ">" 포함 여부</span>
+buffer.<span class="fn">includes</span>(<span class="st">'>'</span>)
+<span class="cm">// LLM이 markdown 인용문 쓰면? → 오탐 😱</span></div>
+</div>
+<div class="box by" style="padding:24px">
+<h3 style="font-size:1.3rem;margin-bottom:12px">Scope Race Condition</h3>
+<p>화살표 키 PTY 전송 ↔ CLI 자동선택 타이밍 충돌<br>→ 3회 재시도 로직 필요</p>
+</div>
+<div class="box" style="padding:24px">
+<h3 style="font-size:1.3rem;margin-bottom:12px">CLI 업데이트 = 대파</h3>
+<p><code class="st">▸ Time:</code> → <code class="st">⏱ Duration:</code><br>한 줄 바뀌면 Job 완료 감지 <span class="tre">전면 실패</span></p>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 12. ACP INTRO ===== -->
+<div class="slide" id="s12">
+<div class="c tc">
+<p class="tm" style="font-size:1.1rem;margin-bottom:8px">근본적 해결</p>
+<h2 style="font-size:2.8rem;margin-bottom:24px">ACP: Agent Client Protocol</h2>
+<p class="sub" style="margin-bottom:40px">텍스트 파싱 대신, <strong style="color:#e6edf3">구조화된 JSON 메시지</strong>로 대화</p>
+<div class="flow">
+<div class="node bb" style="min-width:180px"><strong>AgentManager</strong><br><span class="tm" style="font-size:.8rem">Client</span></div>
+<div class="arr">← JSON-RPC →</div>
+<div class="node bg" style="min-width:180px"><strong>kiro-cli acp</strong><br><span class="tm" style="font-size:.8rem">Server (stdio)</span></div>
+</div>
+<div class="g4 mt2">
+<div class="card bb"><h3 style="font-size:.85rem">initialize</h3><p style="font-size:.75rem">연결</p></div>
+<div class="card bb"><h3 style="font-size:.85rem">session/new</h3><p style="font-size:.75rem">세션 생성</p></div>
+<div class="card bb"><h3 style="font-size:.85rem">session/prompt</h3><p style="font-size:.75rem">프롬프트</p></div>
+<div class="card bg"><h3 style="font-size:.85rem">TurnEnd</h3><p style="font-size:.75rem">완료 알림</p></div>
+</div>
+</div>
+</div>
+
+<!-- ===== 13. BEFORE / AFTER ===== -->
+<div class="slide" id="s13">
+<div class="c">
+<h2>Before / After</h2>
+<div class="versus mt2">
+<div>
+<p class="tre" style="font-weight:700;margin-bottom:10px">Classic (PTY)</p>
+<div class="code" style="font-size:.78rem"><span class="cm">// 완료 감지</span>
+data.<span class="fn">match</span>(<span class="st">/▸\s*Time:\s*([^\n]+)/i</span>)
+
+<span class="cm">// + completionTimer 3초</span>
+<span class="cm">// + Thinking 패턴 취소</span>
+<span class="cm">// + staleTimer 60초</span>
+<span class="cm">// + ... 총 16개 보정</span></div>
+</div>
+<div class="vs">→</div>
+<div>
+<p class="tgr" style="font-weight:700;margin-bottom:10px">ACP (JSON-RPC)</p>
+<div class="code" style="font-size:.78rem"><span class="cm">// 완료 감지</span>
+<span class="kw">if</span> (msg.type === <span class="st">'TurnEnd'</span>) {
+  <span class="fn">completeJob</span>();
+}
+<span class="cm">// 끝. 보정 로직 0개.</span>
+
+
+</div>
+</div>
+</div>
+<div class="tc mt2">
+<div style="display:inline-flex;align-items:center;gap:32px">
+<div><span class="big tre">16</span><br><span class="tm">보정 로직</span></div>
+<span style="font-size:2.5rem;color:#484f58">→</span>
+<div><span class="big tgr">0</span><br><span class="tm">보정 로직</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 14. SEQ: CLASSIC MODE ===== -->
+<div class="slide" id="s14">
+<div class="c">
+<h2>Classic 모드 — 메시지 흐름 <span class="tre"></span></h2>
+<div class="seq" id="seq-classic">
+<div class="seq-head">
+<div class="seq-col c-am">AgentManager</div>
+<div class="seq-col c-cli">kiro-cli --classic</div>
+</div>
+<div class="seq-step" data-i="0"><div class="col"><span class="seq-lbl">PTY spawn</span><div class="seq-arrow" style="left:30%;width:0"></div></div><div class="col"></div></div>
+<div class="seq-step" data-i="1"><div class="col"></div><div class="col"><span class="seq-lbl">ANSI + 스피너 텍스트 쏟아짐</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-step" data-i="2"><div class="col"><span class="seq-lbl warn">regex: 부팅 완료? ">" 포함?</span></div><div class="col"></div></div>
+<div class="seq-note" data-i="3">⏱ bootingTimer 30초 대기...</div>
+<div class="seq-step" data-i="4"><div class="col"><span class="seq-lbl">PTY write: 프롬프트 텍스트</span><div class="seq-arrow" style="left:30%;width:0"></div></div><div class="col"></div></div>
+<div class="seq-step" data-i="5"><div class="col"></div><div class="col"><span class="seq-lbl">raw stdout: "Thinking..." + 코드 + ANSI</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-step" data-i="6"><div class="col"><span class="seq-lbl warn">regex: 승인 필요? [y/n]?</span></div><div class="col"></div></div>
+<div class="seq-step" data-i="7"><div class="col"><span class="seq-lbl">PTY write: "y\n"</span><div class="seq-arrow" style="left:30%;width:0"></div></div><div class="col"></div></div>
+<div class="seq-step" data-i="8"><div class="col"></div><div class="col"><span class="seq-lbl">raw stdout: "▸ Time: 2m 25s"</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-step" data-i="9"><div class="col"><span class="seq-lbl bad">regex 매칭 → 완료? + 3초 타이머 대기</span></div><div class="col"></div></div>
+<div class="seq-note" data-i="10">⚠️ Thinking 다시 오면? 취소! staleTimer 60초? 강제완료!</div>
+<div class="seq-step" data-i="11"><div class="col"><span class="seq-lbl bad">최종 판정: 완료로 간주 (확신 못함)</span></div><div class="col"></div></div>
+</div>
+<div class="step-ctrl"><button class="step-btn" onclick="seqNext('classic')">▶ 다음 단계</button><button class="step-btn reset" onclick="seqReset('classic')">↺ 리셋</button><div class="step-hint">클릭하면 한 단계씩 진행합니다</div></div>
+</div>
+</div>
+
+<!-- ===== 15. SEQ: ACP MODE ===== -->
+<div class="slide" id="s15">
+<div class="c">
+<h2>ACP 모드 — 메시지 흐름 <span class="tgr">(단순)</span></h2>
+<div class="seq" id="seq-acp">
+<div class="seq-head">
+<div class="seq-col c-am">AgentManager</div>
+<div class="seq-col c-cli">kiro-cli acp (stdio)</div>
+</div>
+<div class="seq-step" data-i="0"><div class="col"><span class="seq-lbl good">→ initialize {capabilities}</span><div class="seq-arrow" style="left:30%;width:0"></div></div><div class="col"></div></div>
+<div class="seq-step" data-i="1"><div class="col"></div><div class="col"><span class="seq-lbl good">← initialized {ok}</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-step" data-i="2"><div class="col"><span class="seq-lbl good">→ session/new</span><div class="seq-arrow" style="left:30%;width:0"></div></div><div class="col"></div></div>
+<div class="seq-step" data-i="3"><div class="col"></div><div class="col"><span class="seq-lbl good">← sessionId: "abc123"</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-step" data-i="4"><div class="col"><span class="seq-lbl good">→ session/prompt "버그 수정해줘"</span><div class="seq-arrow" style="left:30%;width:0"></div></div><div class="col"></div></div>
+<div class="seq-step" data-i="5"><div class="col"></div><div class="col"><span class="seq-lbl">← AgentMessageChunk (스트리밍)</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-step" data-i="6"><div class="col"></div><div class="col"><span class="seq-lbl">← ToolCall {name, args}</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-step" data-i="7"><div class="col"></div><div class="col"><span class="seq-lbl good" style="font-size:.85rem;font-weight:700">← TurnEnd ✅</span><div class="seq-arrow rl" style="right:30%;width:0"></div></div></div>
+<div class="seq-note" data-i="8">타이머 0개, regex 0개, 보정 로직 0개. 끝.</div>
+</div>
+<div class="step-ctrl"><button class="step-btn" onclick="seqNext('acp')">▶ 다음 단계</button><button class="step-btn reset" onclick="seqReset('acp')">↺ 리셋</button><div class="step-hint">클릭하면 한 단계씩 진행합니다</div></div>
+</div>
+</div>
+
+<!-- ===== 16. SEQ: MAILBOX MODE ===== -->
+<div class="slide" id="s16">
+<div class="c">
+<h2>Mailbox 모드 — 에이전트 간 인수인계</h2>
+<div class="seq" id="seq-mailbox">
+<div class="seq-head">
+<div class="seq-col c-am">Builder</div>
+<div class="seq-col c-wf">WorkflowEngine</div>
+<div class="seq-col c-rv">Reviewer</div>
+</div>
+<div class="seq-step" data-i="0"><div class="col"><span class="seq-lbl">구현 작업 수행 중...</span></div><div class="col"></div><div class="col"></div></div>
+<div class="seq-step" data-i="1"><div class="col"><span class="seq-lbl good">작업 완료 → outbox/ 파일 생성</span></div><div class="col"></div><div class="col"></div></div>
+<div class="seq-step" data-i="2"><div class="col"></div><div class="col"><span class="seq-lbl warn">파일 감지 (watcher)</span></div><div class="col"></div></div>
+<div class="seq-step" data-i="3"><div class="col"></div><div class="col"><span class="seq-lbl warn">trigger=GO → 다음 스테이지 결정</span></div><div class="col"></div></div>
+<div class="seq-step" data-i="4"><div class="col"></div><div class="col"><span class="seq-lbl">메시지 패키징 (Spec + context)</span><div class="seq-arrow" style="left:55%;width:0"></div></div><div class="col"></div></div>
+<div class="seq-step" data-i="5"><div class="col"></div><div class="col"></div><div class="col"><span class="seq-lbl good">프롬프트 수신 → 리뷰 시작</span></div></div>
+<div class="seq-note" data-i="6">독립 프로세스 · 비동기 · 장애 격리 · 무한루프 방지 (maxCycles)</div>
+</div>
+<div class="step-ctrl"><button class="step-btn" onclick="seqNext('mailbox')">▶ 다음 단계</button><button class="step-btn reset" onclick="seqReset('mailbox')">↺ 리셋</button><div class="step-hint">클릭하면 한 단계씩 진행합니다</div></div>
+</div>
+</div>
+
+<!-- ===== 17. SUBAGENT LIMITS ===== -->
+<div class="slide" id="s17">
+<div class="c">
+<h2>기존: Kiro subagent로 멀티에이전트 개발</h2>
+<div class="flow mt1">
+<div class="node bb" style="min-width:150px"><strong>Project Leader</strong><br><span class="tm" style="font-size:.75rem">Spec 작성</span></div>
+<div class="arr">→</div>
+<div class="node bg" style="min-width:150px"><strong>Builder</strong><br><span class="tm" style="font-size:.75rem">구현</span></div>
+<div class="arr">→</div>
+<div class="node bp" style="min-width:150px"><strong>Reviewer</strong><br><span class="tm" style="font-size:.75rem">검증</span></div>
+<div class="arr">→</div>
+<div class="node by" style="min-width:150px"><strong>Tester</strong><br><span class="tm" style="font-size:.75rem">테스트</span></div>
+</div>
+<p class="tm mt2" style="text-align:center">Kiro CLI의 subagent 기능으로 한 프로세스 안에서 역할을 위임</p>
+<div class="mt2">
+<div class="box br" style="padding:18px;max-width:500px">
+<h3 style="font-size:1rem">🚫 한계</h3>
+<p style="font-size:.85rem;color:#c9d1d9;margin-top:8px">
+모니터링이 쉽지 않음<br>
+가끔 제대로 동작하지 않음 (tool 호출 실패 등)
+</p>
+</div>
+</div>
+<div class="hi hg mt1">
+<p style="color:#e6edf3">→ 프로세스 간 <strong>작업 인수인계</strong> 메커니즘이 필요하다</p>
+</div>
+</div>
+</div>
+
+<!-- ===== 18. MAILBOX ===== -->
+<div class="slide" id="s18">
+<div class="c">
+<h2>Mailbox: 파일 기반 에이전트 간 통신</h2>
+<div class="flow mt1">
+<div class="node bb" style="min-width:130px"><strong>Builder</strong><br><span class="tm" style="font-size:.75rem">작업 완료</span></div>
+<div class="arr">→</div>
+<div class="node by" style="min-width:150px"><strong>outbox/ 파일</strong><br><span class="tm" style="font-size:.75rem">trigger: GO</span></div>
+<div class="arr">→</div>
+<div class="node bp" style="min-width:160px"><strong>WorkflowEngine</strong><br><span class="tm" style="font-size:.75rem">라우팅 결정</span></div>
+<div class="arr">→</div>
+<div class="node bg" style="min-width:130px"><strong>Reviewer</strong><br><span class="tm" style="font-size:.75rem">프롬프트 주입</span></div>
+</div>
+<div class="g2 mt2">
+<div class="code" style="font-size:.76rem;padding:14px 18px"><span class="cm">// 에이전트가 작성하는 메시지</span>
+{
+  "type": "<span class="st">stage_complete</span>",
+  "from": "<span class="st">builder</span>",
+  "trigger": "<span class="st">GO</span>",
+  "content": "<span class="st">구현 완료. 리뷰 부탁</span>",
+  "issueKey": "<span class="st">SBD-816</span>"
+}</div>
+<div>
+<p style="color:#e6edf3;font-weight:600;margin-bottom:12px">효과</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div class="card bg" style="padding:10px 14px"><p style="font-size:.85rem;color:#c9d1d9">독립 프로세스 → 장애 격리</p></div>
+<div class="card bg" style="padding:10px 14px"><p style="font-size:.85rem;color:#c9d1d9">비동기 → 대기 없음</p></div>
+<div class="card bg" style="padding:10px 14px"><p style="font-size:.85rem;color:#c9d1d9">trigger 라우팅 (GO/NO_GO)</p></div>
+<div class="card bg" style="padding:10px 14px"><p style="font-size:.85rem;color:#c9d1d9">maxCycles → 무한 루프 방지</p></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ===== 19. DEMO ===== -->
+<div class="slide" id="s19">
+<div class="c tc">
+<div style="font-size:4rem;margin-bottom:16px">🎬</div>
+<h2 style="font-size:2.5rem">Demo</h2>
+<p class="sub mt1">ACP 모드 연결 → 프롬프트 → 실시간 스트리밍 → 완료</p>
+<div class="flow mt2">
+<div class="card bb" style="min-width:160px"><div class="ic">1️⃣</div><h3>연결</h3><p>Kiro ACP</p></div>
+<div class="arr">→</div>
+<div class="card bg" style="min-width:160px"><div class="ic">2️⃣</div><h3>요청</h3><p>프롬프트 전송</p></div>
+<div class="arr">→</div>
+<div class="card bp" style="min-width:160px"><div class="ic">3️⃣</div><h3>확인</h3><p>결과 + Task 연결</p></div>
+</div>
+</div>
+</div>
+
+<!-- ===== 20. END ===== -->
+<div class="slide" id="s20">
+<div class="c tc">
+<h1 style="font-size:3.2rem;margin-bottom:24px">감사합니다</h1>
+<p class="sub" style="margin-bottom:40px">Q & A</p>
+<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+</div>
+</div>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')],total=slides.length;let cur=0;
+function go(n){if(n<0||n>=total)return;slides[cur].classList.remove('active');cur=n;slides[cur].classList.add('active');upd()}
+function upd(){document.getElementById('counter').textContent=(cur+1)+' / '+total;document.getElementById('progress').style.width=((cur+1)/total*100)+'%'}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();go(cur+1)}if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(cur-1)}if(e.key==='Home')go(0);if(e.key==='End')go(total-1)});
+let tx=0;document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX});document.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-tx;if(d<-50)go(cur+1);if(d>50)go(cur-1)});
+// Sequence animation
+const seqState={classic:0,acp:0,mailbox:0};
+function seqNext(id){const el=document.getElementById('seq-'+id);const items=el.querySelectorAll('.seq-step,.seq-note');const i=seqState[id];if(i>=items.length)return;items[i].classList.add('vis');seqState[id]++}
+function seqReset(id){const el=document.getElementById('seq-'+id);el.querySelectorAll('.seq-step,.seq-note').forEach(e=>e.classList.remove('vis'));seqState[id]=0}
+go(0);
+</script>
+</body>
+</html>
