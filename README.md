@@ -37,7 +37,7 @@
 <br>
 
 ## 사용자 인터뷰
-
+- [Kiro 사용자 인터뷰 #2 - 메가존클라우드 최지연님](https://yanlog.yanbert.com/ko/blog/kiro-user-interview-002-20260602/)
 - [Kiro 사용자 인터뷰 #1 - VPPLAB 정희인님](https://yanlog.yanbert.com/ko/blog/kiro-user-interview-001-20260526/)
 
 <br>
